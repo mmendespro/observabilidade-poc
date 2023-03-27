@@ -35,21 +35,22 @@ O Logback é um sistema de registro maduro e flexível e que pode ser usado dire
 
 SLF4J uma fachada ou abstração de logs para várias estruturas. Para logar com SLF4J, primeiro temos que obter uma instância Logger usando LoggerFactory, conforme mostrado abaixo:
 
-```
+```java
 public class Example {
     final Logger log = LoggerFactory.getLogger(Example.class);
 }
 ```
 Para ser menos prolixo e evitar nos repetirmos em todas as classes que queremos realizar o logging, podemos usar o ***Lombok***. Ele fornece a anotação ***@Slf4j*** para gerar o campo logger para nós. A classe mostrada acima é equivalente à classe mostrada abaixo:
 
-```
+```java
 @Slf4j
 public class Example {
 
 }
 ```
 Depois de obter a instância do logger, podemos executar o seguinte código:
-```
+
+```java
 log.trace("Logging at TRACE level");
 log.debug("Logging at DEBUG level");
 log.info("Logging at INFO level");
@@ -57,12 +58,13 @@ log.warn("Logging at WARN level");
 log.error("Logging at ERROR level");
 ```
 Mensagens parametrizadas com a sintaxe {} também podem ser usadas. Essa abordagem é preferível à concatenação de strings, pois não incorre no custo da construção do parâmetro caso o nível de log seja desabilitado:
-```
+
+```java
 log.debug("Found {} results", list.size());
 ```
 Em aplicativos Spring Boot, o Logback pode ser configurado no arquivo ***logback-spring.xml***, localizado na pasta de recursos. Neste arquivo de configuração, podemos aproveitar os perfis do Spring e os recursos de modelagem fornecidos pelo Spring Boot.
 
-```
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
@@ -85,7 +87,7 @@ Com essas informações, ao visualizar os logs, poderemos obter todos os eventos
 
 Depois que a dependência do Spring Cloud Sleuth for adicionada ao classpath, todas as interações com os serviços downstream serão logadas automaticamente e os IDs de ***trace*** e extensão serão adicionados ao ***Mapped Diagnostic Context (MDC)*** do SLF4J, que será incluído nos logs.
 
-```
+```xml
 <dependencyManagement>
     <dependencies>
         <dependency>
@@ -115,7 +117,7 @@ E, em vez de gerenciar arquivos de log diretamente, nossos microsserviços podem
 
 Para uma configuração simples e rápida, podemos usar o ***LogstashEncoder***, que vem com um conjunto predefinido de provedores:
 
-```
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
@@ -133,7 +135,7 @@ Para uma configuração simples e rápida, podemos usar o ***LogstashEncoder***,
 ```
 A configuração acima produzirá a seguinte saída de log (lembre-se de que a saída real é uma única linha, mas foi formatada abaixo para melhor visualização):
 
-```
+```json
 {
    "@timestamp": "2019-06-29T23:01:38.967+01:00",
    "@version": "1",
@@ -156,7 +158,7 @@ Este codificador inclui os valores armazenados no MDC por padrão. Quando ***Spr
 
 Se precisarmos de mais flexibilidade no formato JSON e nos dados incluídos no log, podemos usar ***LoggingEventCompositeJsonEncoder***. O codificador composto não possui provedores configurados por padrão, então devemos adicionar os provedores que queremos para customizar a saída:
 
-```
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
@@ -210,7 +212,7 @@ Se precisarmos de mais flexibilidade no formato JSON e nos dados incluídos no l
 ```
 Abaixo uma amostra da saída de log para a configuração acima. Novamente, a saída real é uma única linha, mas foi formatada para melhor visualização:
 
-```
+```json
 {  
    "@timestamp": "2019-06-29T22:01:38.967Z",
    "@version": "1",
@@ -248,7 +250,7 @@ Quando os aplicativos são executados em contêineres, eles se tornam alvos móv
 - Decodifique o campo de mensagem para um objeto JSON quando o log foi produzido por um contêiner que tem o label ***decode_log_event_to_json_object*** definido como true
 - Enviar os log para o Logstash que é executado na porta 5044
 
-```
+```yaml
 filebeat.autodiscover:
   providers:
     - type: docker
@@ -287,7 +289,7 @@ No arquivo logstash.conf, o Logstash é configurado para:
 - Processar os eventos adicionando a tag logstash_filter_applied
 - Enviar os eventos processados para o Elasticsearch que é executado na porta 9200
 
-```
+```java
 input {
   beats {
     port => 5044

@@ -1,0 +1,9 @@
+spring:
+  main:
+    banner-mode: "off"
+
+services:
+  department:
+    base-url: http://service-department:8002
+  employee:
+    base-url: http://service-employee:8003
