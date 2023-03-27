@@ -1,0 +1,6 @@
+server:
+  port: ${PORT:8002}
+
+services:
+  employee:
+    base-url: http://localhost:8003
