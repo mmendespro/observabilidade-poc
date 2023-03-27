@@ -273,3 +273,37 @@ filebeat.autodiscover:
 output.logstash:
   hosts: "logstash:5044"
 ```
+A configuração acima usa um único processador. Se precisarmos, podemos adicionar mais processadores, que serão encadeados e executados na ordem em que forem definidos no arquivo de configuração. Cada processador recebe um evento, aplica uma ação definida ao evento e o evento processado é a entrada do próximo processador até o final da cadeia.
+
+Depois que o log é coletado e processado pelo ***Filebeat***, ele é enviado para o ***Logstash***, que fornece um rico conjunto de plug-ins para processamento adicional dos eventos.
+
+A ***pipeline Logstash*** tem dois elementos obrigatórios, ***input*** e ***output***, e um elemento opcional, ***filter***. Os plug-ins de entrada consomem dados de uma fonte, os plug-ins de filtro modificam os dados conforme especificado e os plug-ins de saída gravam os dados em um destino.
+
+![diagram-logstash-pipeline](./docs/imgs/diagram-logstash-pipeline.png)
+
+No arquivo logstash.conf, o Logstash é configurado para:
+
+- Receber eventos vindos do Beats na porta 5044
+- Processar os eventos adicionando a tag logstash_filter_applied
+- Enviar os eventos processados para o Elasticsearch que é executado na porta 9200
+
+```
+input {
+  beats {
+    port => 5044
+  }
+}
+
+filter {
+  mutate {
+    add_tag => [ "logstash_filter_applied" ]
+  }
+}
+
+output {
+  elasticsearch {
+    hosts => "elasticsearch:9200"
+  }
+}
+```
+O Elasticsearch armazenará e indexará os log e, por fim, poderemos visualizar os logs no Kibana, que expõe uma UI na porta 5601.
