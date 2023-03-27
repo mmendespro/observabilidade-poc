@@ -238,3 +238,38 @@ Dê uma olhada em como os serviços são definidos e configurados no ***docker-c
 - **collect_logs_with_filebeat**: Quando definido como true, indica que o Filebeat deve coletar os logs produzidos pelo contêiner do Docker.
 
 - **decode_log_event_to_json_object**: o Filebeat coleta e armazena o evento de log como uma string na propriedade message de um documento JSON. Se os eventos forem registrados como JSON (que é o caso ao usar os anexadores definidos acima), o valor desse rótulo pode ser definido como true para indicar que o Filebeat deve decodificar a string JSON armazenada na propriedade da mensagem para um objeto JSON real.
+
+Os microsserviços produzirão logs na saída padrão (stdout). Por padrão, o Docker captura a saída padrão (e o erro padrão) de todos os seus contêineres e os grava em arquivos no formato JSON, usando o driver de arquivo json. Os arquivos de log são armazenados no diretório ***/var/lib/docker/containers*** e cada arquivo de log contém informações sobre apenas um contêiner.
+
+Quando os aplicativos são executados em contêineres, eles se tornam alvos móveis para o sistema de monitoramento. Portanto, usaremos o recurso de **autodiscover** do Filebeat, que permite rastrear os contêineres e adaptar as configurações à medida que as alterações acontecem. Ao definir modelos de configuração, o autodiscover pode monitorar serviços conforme eles começam a ser executados. Portanto, no arquivo ***filebeat.docker.yml***, o Filebeat é configurado para:
+
+- Autodiscover dos contêineres do Docker que têm o label ***collect_logs_with_filebeat*** definido como true
+- Coletar logs dos contêineres que foram descobertos
+- Decodifique o campo de mensagem para um objeto JSON quando o log foi produzido por um contêiner que tem o label ***decode_log_event_to_json_object*** definido como true
+- Enviar os log para o Logstash que é executado na porta 5044
+
+```
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      labels.dedot: true
+      templates:
+        - condition:
+            contains:
+              container.labels.collect_logs_with_filebeat: "true"
+          config:
+            - type: container
+              format: docker
+              paths:
+                - "/var/lib/docker/containers/${data.docker.container.id}/*.log"
+              processors:
+                - decode_json_fields:
+                    when.equals:
+                      docker.container.labels.decode_log_event_to_json_object: "true"
+                    fields: ["message"]
+                    target: ""
+                    overwrite_keys: true
+
+output.logstash:
+  hosts: "logstash:5044"
+```
