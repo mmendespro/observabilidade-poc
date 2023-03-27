@@ -1,4 +1,4 @@
-package main.java.net.local.poc.employee.service.web.exceptions;
+package net.local.poc.employee.service.web.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
