@@ -1,4 +1,4 @@
-package net.local.poc.department.service;
+package net.local.poc.employee.service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
