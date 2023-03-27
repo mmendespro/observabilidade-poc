@@ -307,3 +307,12 @@ output {
 }
 ```
 O Elasticsearch armazenará e indexará os log e, por fim, poderemos visualizar os logs no Kibana, que expõe uma UI na porta 5601.
+
+## Exemplo
+Para este exemplo, vamos considerar que estamos criando um de controle para gerir empresas, departamentos e funcionários e teremos os seguintes microsserviços:
+
+- service-organizacao: Gerencia os detalhes relacionados às empresas.
+- service-departamento: Gerencia os detalhes relacionados aos departamento de uma empresa.
+- service-empregado: Gerencia os detalhes relacionados aos empregados de uma empresa e associados a um departamento.
+
+Cada microsserviço é um aplicativo Spring Boot, expondo uma API HTTP. Como pretendemos focar na agregação de logs, vamos simplificar quando se trata da arquitetura de serviços: um serviço simplesmente invocará o outro serviço diretamente.
