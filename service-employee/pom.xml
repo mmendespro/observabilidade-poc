@@ -42,12 +42,6 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
-        <!-- Spring Feign Client -->
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-openfeign</artifactId>
-		</dependency>
-
         <!-- Spring Cloud Sleuth -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -98,11 +92,12 @@
                     </excludes>
                 </configuration>
             </plugin>
+
             <!-- Dockerfile from Spotify -->
             <plugin>
                 <groupId>com.spotify</groupId>
                 <artifactId>dockerfile-maven-plugin</artifactId>
-                <version>${dockerfile-maven-plugin.version}</version>
+                <version>1.4.10</version>
                 <configuration>
                     <repository>${docker.image.prefix}/${project.artifactId}</repository>
                 </configuration>
