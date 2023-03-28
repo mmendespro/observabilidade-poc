@@ -1,7 +1,0 @@
-spring:
-  main:
-    banner-mode: "off"
-
-services:
-  employee:
-    base-url: http://service-employee:8003

@@ -1,8 +1,0 @@
-server:
-  port: ${PORT:8001}
-
-services:
-  department:
-    base-url: http://localhost:8002
-  employee:
-    base-url: http://localhost:8003

@@ -310,11 +310,27 @@ output {
 ```
 O Elasticsearch armazenará e indexará os log e, por fim, poderemos visualizar os logs no Kibana, que expõe uma UI na porta 5601.
 
-## Exemplo
-Para este exemplo, vamos considerar que estamos criando um de controle para gerir empresas, departamentos e funcionários e teremos os seguintes microsserviços:
+## Exemplo EndToEnd
+Para este exemplo, vamos considerar que estamos criando um controle compras de produtos e teremos os seguintes componentes listados no esquema arquitetural abaixo:
 
-- service-organizacao: Gerencia os detalhes relacionados às empresas.
-- service-departamento: Gerencia os detalhes relacionados aos departamento de uma empresa.
-- service-empregado: Gerencia os detalhes relacionados aos empregados de uma empresa e associados a um departamento.
+![solution-diagram](./docs/imgs/solution-diagram.png)
+
+No esquema acima podemos destacar os seguintes serviços:
+
+- Config Service: ficará responsável por gerir as configurações de todos os microsserviços, utilizaremos para este fim o ***Spring Cloud Config***.
+- Discovery Service: ficará responsável pelo registro de todos os microsserviços da nossa aplicação, para isso usaremos o ***Eurika***.
+- Auth Service: será responsavel por gerir todas as autenticações usando token JWT, para este fim usaremos o ***Keycloack***.
+- API Gateway: será responsável por autenticar e rotear todas as requisições feitas aos microsserviços, para este fim será usado o ***Spring Cloud Gateway***.
+- Product Service: ficará responsável por gerir o cadastro de todos os produtos.
+- Order Service: ficará responsável por todas as compras realizadas, ele usará base de dados transacional MySQL e se comunicará com dois outros serviços (Inventory e Notification).
+- Inventory Service: fica responsável por gerir o estoque de cada produto.
+- Notification Service: fica responsável por enviar todas as notificações do sistema ao usuário, ou seja, se uma compra foi concluída com sucesso ou não.
+
+Para a parte de observabilidade do ambiente usaremos a stack abaixo:
+
+- Zipkin
+- Prometheus
+- Grafana
+- ELK Stack
 
 Cada microsserviço é um aplicativo Spring Boot, expondo uma API HTTP. Como pretendemos focar na agregação de logs, vamos simplificar quando se trata da arquitetura de serviços: um serviço simplesmente invocará o outro serviço diretamente.
