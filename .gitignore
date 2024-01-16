@@ -1,3 +1,2 @@
 .vscode/
-docker/filebeat/data
-docker/elasticsearch/data
+docs/docker/vols/*

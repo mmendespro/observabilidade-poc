@@ -1,0 +1,7 @@
+POST http://localhost:8082/v1/organizations
+Content-Type: application/json
+
+{
+    "organizationId": "DFX",
+    "organizationName": "DFX Transporte"
+}

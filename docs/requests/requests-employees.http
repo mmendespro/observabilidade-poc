@@ -1,0 +1,11 @@
+GET http://localhost:8080/v1/employees/organization/DFX
+###
+POST http://localhost:8080/v1/employees
+Content-Type: application/json
+
+{
+    "organizationId": "DFX",
+    "departmentId": "RS",
+    "employeeId": "BBB",
+    "employeeName": "BBBBBB BBBBB"
+}

@@ -1,0 +1,10 @@
+GET http://localhost:8081/v1/departments/organization/DFX
+###
+POST http://localhost:8081/v1/departments
+Content-Type: application/json
+
+{
+    "organizationId": "DFX",
+    "departmentId": "IT",
+    "departmentName": "Info Tech"
+}
