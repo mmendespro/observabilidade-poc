@@ -1,0 +1,9 @@
+spring:
+  main:
+    banner-mode: "off"
+  zipkin:
+    baseUrl: http://openzipkin:9411
+
+services:
+  employee_url: http://service-employee:8080/v1/employees
+  department_url: http://service-employee:8081/v1/departments

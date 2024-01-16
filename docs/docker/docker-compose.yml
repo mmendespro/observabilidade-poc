@@ -1,0 +1,122 @@
+version: "3.5"
+
+networks:
+  localnet:
+    name: localnet
+    driver: bridge
+
+services:
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.2.0
+    container_name: elasticsearch
+    ports:
+      - "9200:9200"
+    environment:
+      - "discovery.type=single-node"
+    volumes:
+      - $PWD/vols/elasticsearch_data:/usr/share/elasticsearch/data:rw              # Persistence data
+    networks:
+      - localnet
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.2.0
+    container_name: logstash
+    ports:
+      - "25826:25826"
+      - "5044:5044"
+    volumes:
+      - $PWD/etc/logstash/pipeline:/usr/share/logstash/pipeline:ro                # Pipeline configuration
+    restart: on-failure
+    depends_on:
+      - elasticsearch
+    networks:
+      - localnet
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:7.2.0
+    container_name: filebeat
+    volumes:
+      - $PWD/etc/filebeat/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro # Configuration file
+      - $PWD/vols/filebeat_data:/usr/share/filebeat/data:rw                # Persistence data
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro           # Docker logs
+      - /var/run/docker.sock:/var/run/docker.sock:ro                       # Additional information about containers
+    user: root                                                             # Allow access to log files and docker.sock
+    restart: on-failure
+    depends_on:
+      - logstash
+    networks:
+      - localnet
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.2.0
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    restart: on-failure
+    depends_on:
+      - elasticsearch
+    networks:
+      - localnet
+
+  openzipkin:
+    image: openzipkin/zipkin
+    container_name: openzipkin
+    hostname: openzipkin
+    restart: unless-stopped
+    ports:
+      - 9411:9411
+    networks:
+      - localnet
+
+  service-organization:
+    image: poc/service-organization:latest
+    container_name: service-organization
+    build:
+      context: ../../service-organization
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    labels:
+      collect_logs_with_filebeat: "true"
+      decode_log_event_to_json_object: "true"
+    networks:
+      - localnet
+    depends_on:
+      - elasticsearch
+      - openzipkin
+
+  service-department:
+    image: poc/service-department:latest
+    container_name: service-department
+    build:
+      context: ../../service-department
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    labels:
+      # Atraves das labels o filebeat vai coletar os logs e mandar para o logstash
+      collect_logs_with_filebeat: "true"
+      decode_log_event_to_json_object: "true"
+    networks:
+      - localnet
+    depends_on:
+      - elasticsearch
+      - openzipkin
+
+  service-employee:
+    image: poc/service-employee:latest
+    container_name: service-employee
+    build:
+      context: ../../service-employee
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    labels:
+      collect_logs_with_filebeat: "true"
+      decode_log_event_to_json_object: "true"
+    networks:
+      - localnet
+    depends_on:
+      - elasticsearch
+      - openzipkin

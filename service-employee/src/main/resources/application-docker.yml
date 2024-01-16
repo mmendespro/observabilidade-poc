@@ -1,0 +1,5 @@
+spring:
+  main:
+    banner-mode: "off"
+  zipkin:
+    baseUrl: http://openzipkin:9411
